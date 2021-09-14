@@ -9,6 +9,7 @@ import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
@@ -22,23 +23,23 @@ public class TikaTool {
 
     /**
      * 解析文件，返回map对象，包含文件内容及文件元数据
-     * @param file
+     * @param fileName, input
      * @return Map<String,Object>
      */
-    public static Map<String, Object> parseFile(File file) {
+    public static Map<String, Object> parseFile(String fileName, InputStream input) {
         Map<String, Object> meta = new HashMap<String, Object>();
         Parser parser = null;
-        String suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         if (suffix.equals("xlsx")) {
             parser = new OOXMLParser();
         } else {
             parser = new AutoDetectParser();
          }
 
-        try (InputStream input = new FileInputStream(file)) {
+        try {
             Metadata metadata = new Metadata();
             metadata.set(Metadata.CONTENT_ENCODING, "utf-8");
-            metadata.set(Metadata.RESOURCE_NAME_KEY, file.getName());
+            metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
 
             ContentHandler handler = new BodyContentHandler(maxSize);
             ParseContext context = new ParseContext();
@@ -52,18 +53,27 @@ public class TikaTool {
             return meta;
         } catch (Exception e) {
             e.printStackTrace();
+        }finally {
+            // 文档输入原始 字节流，需要手动关闭
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
 
     /**
      * Tika解析文件，返回字符串文件内容
-     * @param file
+     * @param fileName, input
      * @return String
      */
-    public static String parseFileContent(File file) {
+    public static String parseFileContent(String fileName, InputStream input) {
         Parser parser = null;
-        String suffix = file.getName().substring(file.getName().lastIndexOf(".") + 1);
+        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
         if (suffix.equals("xlsx")) {
             parser = new OOXMLParser();
         } else {
@@ -71,10 +81,10 @@ public class TikaTool {
         }
 
         Metadata metadata = null;
-        try (FileInputStream input = new FileInputStream(file)) {
+        try {
             metadata = new Metadata();
             metadata.set(Metadata.CONTENT_ENCODING, "utf-8");
-            metadata.set(Metadata.RESOURCE_NAME_KEY, file.getName());
+            metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
 
             ContentHandler handler = new BodyContentHandler(maxSize);
             ParseContext context = new ParseContext();
@@ -84,6 +94,15 @@ public class TikaTool {
             return handler.toString();
         } catch (Exception e) {
             e.printStackTrace();
+        } finally {
+            // 文档输入原始 字节流，需要手动关闭
+            try {
+                if (input != null) {
+                    input.close();
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
         return null;
     }
