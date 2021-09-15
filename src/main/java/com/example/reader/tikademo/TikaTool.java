@@ -4,11 +4,8 @@ import org.apache.tika.metadata.Metadata;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
-import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -23,23 +20,16 @@ public class TikaTool {
 
     /**
      * 解析文件，返回map对象，包含文件内容及文件元数据
-     * @param fileName, input
+     * @param  input
      * @return Map<String,Object>
      */
-    public static Map<String, Object> parseFile(String fileName, InputStream input) {
+    public static Map<String, Object> parseFile(InputStream input) {
         Map<String, Object> meta = new HashMap<String, Object>();
-        Parser parser = null;
-        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-        if (suffix.equals("xlsx")) {
-            parser = new OOXMLParser();
-        } else {
-            parser = new AutoDetectParser();
-         }
+        Parser parser = new AutoDetectParser();;
 
         try {
             Metadata metadata = new Metadata();
             metadata.set(Metadata.CONTENT_ENCODING, "utf-8");
-            metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
 
             ContentHandler handler = new BodyContentHandler(maxSize);
             ParseContext context = new ParseContext();
@@ -54,7 +44,6 @@ public class TikaTool {
         } catch (Exception e) {
             e.printStackTrace();
         }finally {
-            // 文档输入原始 字节流，需要手动关闭
             try {
                 if (input != null) {
                     input.close();
@@ -68,23 +57,15 @@ public class TikaTool {
 
     /**
      * Tika解析文件，返回字符串文件内容
-     * @param fileName, input
+     * @param  input
      * @return String
      */
-    public static String parseFileContent(String fileName, InputStream input) {
-        Parser parser = null;
-        String suffix = fileName.substring(fileName.lastIndexOf(".") + 1);
-        if (suffix.equals("xlsx")) {
-            parser = new OOXMLParser();
-        } else {
-            parser = new AutoDetectParser();
-        }
-
+    public static String parseFileContent(InputStream input) {
+        Parser parser = new AutoDetectParser();
         Metadata metadata = null;
         try {
             metadata = new Metadata();
             metadata.set(Metadata.CONTENT_ENCODING, "utf-8");
-            metadata.set(Metadata.RESOURCE_NAME_KEY, fileName);
 
             ContentHandler handler = new BodyContentHandler(maxSize);
             ParseContext context = new ParseContext();
@@ -95,7 +76,6 @@ public class TikaTool {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            // 文档输入原始 字节流，需要手动关闭
             try {
                 if (input != null) {
                     input.close();
