@@ -24,6 +24,7 @@ public class SplitFile {
             num ++ ;
             // 非空的字符串才写入文件
             if(str.trim().length()!=0){
+                // TODO 测试阶段，先写死
                 w = new FileWriter("D:\\test\\temp\\"+num);
                 w.write(str.trim()+"--");
                 w.flush();

@@ -357,7 +357,7 @@ public class ParseMail {
         // 切割原始邮件文件自后，每个邮件一个文件
         //        File directory = new File(dir);
 
-        //TODO 集成SplitFile的split方法，将原始邮件文件切分成，每个邮件一个文件，
+        //TODO 后期需要集成SplitFile的split方法，将原始邮件文件切分成，每个邮件一个文件，目前先写死
         File directory = new File("D:\\test\\temp");
         File[] files = directory.listFiles();
         Writer w = null;
@@ -371,7 +371,6 @@ public class ParseMail {
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("subject", pmm.getSubject());
-            //TODO 待处理
             node.put("sentdate", pmm.getSentDate());
             node.put("form", pmm.getFromAddr());
             node.put("to", pmm.getMailAddress("to"));
@@ -385,7 +384,6 @@ public class ParseMail {
             w.flush();
 
             // 保存邮件内容
-            // TODO 区分邮件正文的  html和plain两种内容
             pmm.getMailContent((Part) mimeMessage);
             File plainFile = new File(f.getParentFile().getAbsolutePath() + "\\" + f.getName() + ".txt");
             w = new FileWriter(plainFile);
