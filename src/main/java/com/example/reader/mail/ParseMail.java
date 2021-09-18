@@ -17,6 +17,8 @@ public class ParseMail {
     private String saveAttachPath = "D:\\test"; //附件下载后的存放目录
     private StringBuffer bodytext = new StringBuffer();//存放邮件内容
     private String dateformat = "yyyy-MM-dd HH:mm"; //默认的日前显示格式
+    private StringBuffer plainText = new StringBuffer(); // 邮件正文的纯文本内容
+    private StringBuffer htmlText = new StringBuffer(); // 邮件正文的html内容
 
     public ParseMail(MimeMessage mimeMessage) {
         this.mimeMessage = mimeMessage;
@@ -24,6 +26,34 @@ public class ParseMail {
 
     public void setMimeMessage(MimeMessage mimeMessage) {
         this.mimeMessage = mimeMessage;
+    }
+
+    /**
+     * 获得邮件发送日期
+     */
+    public String getSentDate() throws Exception {
+        Date sentdate = mimeMessage.getSentDate();
+        SimpleDateFormat format = new SimpleDateFormat(dateformat);
+        return format.format(sentdate);
+    }
+
+    /**
+     * 获得邮件正文内容
+     */
+    public String getBodyText() {
+        return bodytext.toString();
+    }
+    /**
+     * 获得邮件正文 纯文本内容
+     */
+    public String getPlainText(){
+        return plainText.toString();
+    }
+    /**
+     * 获得邮件正文 html内容
+     */
+    public String getHtmlText(){
+        return htmlText.toString();
     }
 
     /**
@@ -99,21 +129,6 @@ public class ParseMail {
         return subject;
     }
 
-    /**
-     * 获得邮件发送日期
-     */
-    public String getSentDate() throws Exception {
-        Date sentdate = mimeMessage.getSentDate();
-        SimpleDateFormat format = new SimpleDateFormat(dateformat);
-        return format.format(sentdate);
-    }
-
-    /**
-     * 获得邮件正文内容
-     */
-    public String getBodyText() {
-        return bodytext.toString();
-    }
 
     /**
      * 解析邮件，把得到的邮件内容保存到一个StringBuffer对象中，解析邮件 主要是根据MimeType类型的不同执行不同的操作，一步一步的解析
@@ -130,15 +145,16 @@ public class ParseMail {
         //        System.out.println("CONTENTTYPE: " + contenttype);
         if (part.isMimeType("text/plain") && !conname) {
             bodytext.append((String) part.getContent());
+            plainText.append((String) part.getContent());
         } else if (part.isMimeType("text/html") && !conname) {
             bodytext.append((String) part.getContent());
+            htmlText.append((String) part.getContent());
         } else if (part.isMimeType("multipart/*")) {
             Multipart multipart = (Multipart) part.getContent();
             int counts = multipart.getCount();
             for (int i = 0; i < counts; i++) {
                 getMailContent(multipart.getBodyPart(i));
             }
-
         } else if (part.isMimeType("message/rfc822")) {
             getMailContent((Part) part.getContent());
         } else {}
@@ -367,9 +383,13 @@ public class ParseMail {
             // 保存邮件内容
             // TODO 区分邮件正文的  html和plain两种内容
             pmm.getMailContent((Part) mimeMessage);
-            File contentFile = new File(f.getParentFile().getAbsolutePath() + "\\" + f.getName() + ".html");
-            w = new FileWriter(contentFile);
-            w.write(pmm.getBodyText());
+            File plainFile = new File(f.getParentFile().getAbsolutePath() + "\\" + f.getName() + ".txt");
+            w = new FileWriter(plainFile);
+            w.write(pmm.getPlainText());
+            w.flush();
+            File htmlFile = new File(f.getParentFile().getAbsolutePath() + "\\" + f.getName() + ".html");
+            w = new FileWriter(htmlFile);
+            w.write(pmm.getHtmlText());
             w.flush();
 
             // 保存附件
