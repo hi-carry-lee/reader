@@ -1,9 +1,11 @@
 package com.example.reader.tikademo;
 
 import org.apache.tika.metadata.Metadata;
+import org.apache.tika.metadata.TikaCoreProperties;
 import org.apache.tika.parser.AutoDetectParser;
 import org.apache.tika.parser.ParseContext;
 import org.apache.tika.parser.Parser;
+import org.apache.tika.parser.microsoft.ooxml.OOXMLParser;
 import org.apache.tika.sax.BodyContentHandler;
 import org.xml.sax.ContentHandler;
 import java.io.IOException;
@@ -20,25 +22,25 @@ public class TikaTool {
 
     /**
      * 解析文件，返回map对象，包含文件内容及文件元数据
-     * @param  input
+     * @param  filename, input
      * @return Map<String,Object>
      */
-    public static Map<String, Object> parseFile(InputStream input) {
+    public static Map<String, Object> parseFile(String filename, InputStream input) {
         Map<String, Object> meta = new HashMap<String, Object>();
-        Parser parser = new AutoDetectParser();;
+        Parser parser = new AutoDetectParser();
+//        Parser parser = new OOXMLParser();
 
         try {
             Metadata metadata = new Metadata();
             metadata.set(Metadata.CONTENT_ENCODING, "utf-8");
+            metadata.set(TikaCoreProperties.RESOURCE_NAME_KEY, filename);
 
             ContentHandler handler = new BodyContentHandler(maxSize);
             ParseContext context = new ParseContext();
             context.set(Parser.class, parser);
 
             parser.parse(input, handler, metadata, context);
-            for (String name : metadata.names()) {
-                meta.put(name, metadata.get(name));
-            }
+
             meta.put("content", handler.toString());
             return meta;
         } catch (Exception e) {

@@ -315,7 +315,7 @@ public class ParseMail {
 
 
     /**
-     * file 邮件文件
+     * 测试方法，待优化
      */
     public static void main(String args[]) throws Exception {
         // 定义连接POP3服务器的属性信息
@@ -335,11 +335,14 @@ public class ParseMail {
 
         // 切割原始邮件文件自后，每个邮件一个文件
         //        File directory = new File(dir);
+
+        //TODO 集成SplitFile的split方法，将原始邮件文件切分成，每个邮件一个文件，
         File directory = new File("D:\\test\\temp");
         File[] files = directory.listFiles();
         Writer w = null;
         for (File f : files) {
             FileInputStream inputStream = new FileInputStream(f);
+            // 使用流和session来生成 Mime类型的邮件类
             MimeMessage mimeMessage = new MimeMessage(session, inputStream);
             ParseMail pmm = new ParseMail((MimeMessage) mimeMessage);
 
@@ -361,6 +364,7 @@ public class ParseMail {
             w.flush();
 
             // 保存邮件内容
+            // TODO 区分邮件正文的  html和plain两种内容
             pmm.getMailContent((Part) mimeMessage);
             File contentFile = new File(f.getParentFile().getAbsolutePath() + "\\" + f.getName() + ".html");
             w = new FileWriter(contentFile);
