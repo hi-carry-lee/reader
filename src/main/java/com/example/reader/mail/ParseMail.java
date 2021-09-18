@@ -27,18 +27,25 @@ public class ParseMail {
     }
 
     /**
-     * 获得发件人的地址和姓名
+     * 获得发件人的地址
      */
-    public String getFrom() throws Exception {
+    public String getFromAddr() throws Exception {
         InternetAddress address[] = (InternetAddress[]) mimeMessage.getFrom();
-        String from = address[0].getAddress();
-        if (from == null)
-            from = "";
-        String personal = address[0].getPersonal();
-        if (personal == null)
-            personal = "";
-        String fromaddr = personal + "<" + from + ">";
-        return fromaddr;
+        String fromAddr = address[0].getAddress();
+        if (fromAddr == null)
+            fromAddr = "";
+        return fromAddr;
+    }
+
+    /**
+     * 获得发件人名称
+     */
+    public String getFromName() throws Exception {
+        InternetAddress address[] = (InternetAddress[]) mimeMessage.getFrom();
+        String fromName = address[0].getPersonal();
+        if (fromName == null)
+            fromName = "";
+        return fromName;
     }
 
     /**
@@ -67,13 +74,8 @@ public class ParseMail {
                     else {
                         email = MimeUtility.decodeText(email);
                     }
-                    String personal = address[i].getPersonal();
-                    if (personal == null)
-                        personal = "";
-                    else {
-                        personal = MimeUtility.decodeText(personal);
-                    }
-                    String compositeto = personal + "<" + email + ">";
+
+                    String compositeto = email;
                     mailaddr += "," + compositeto;
                 }
                 mailaddr = mailaddr.substring(1);
@@ -313,7 +315,6 @@ public class ParseMail {
         }
     }
 
-
     /**
      * 测试方法，待优化
      */
@@ -352,7 +353,7 @@ public class ParseMail {
             node.put("subject", pmm.getSubject());
             //TODO 待处理
             node.put("sentdate", pmm.getSentDate());
-            node.put("form", pmm.getFrom());
+            node.put("form", pmm.getFromAddr());
             node.put("to", pmm.getMailAddress("to"));
             node.put("cc", pmm.getMailAddress("cc"));
             node.put("bcc", pmm.getMailAddress("bcc"));
