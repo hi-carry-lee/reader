@@ -321,8 +321,6 @@ public class ParseMail {
         // 定义连接POP3服务器的属性信息
         String pop3Server = "pop.qq.com";
         String protocol = "imap";
-        String username = "1473685172@qq.com";
-        String password = "ijvyspcvpvsrhbgc";
 
         Properties props = new Properties();
         props.setProperty("mail.transport.protocol", protocol); // 使用的协议（JavaMail规范要求）
@@ -331,13 +329,12 @@ public class ParseMail {
         // 获取连接
         Session session = Session.getDefaultInstance(props);
         session.setDebug(false);
-        Store store = session.getStore(protocol);
 
-//        File mailFile = new File("D:\\mail");
-//        String dir = SplitFile.split(mailFile);
+        //        File mailFile = new File("D:\\mail");
+        //        String dir = SplitFile.split(mailFile);
 
         // 切割原始邮件文件自后，每个邮件一个文件
-//        File directory = new File(dir);
+        //        File directory = new File(dir);
         File directory = new File("D:\\test\\temp");
         File[] files = directory.listFiles();
         Writer w = null;
@@ -345,15 +342,14 @@ public class ParseMail {
             FileInputStream inputStream = new FileInputStream(f);
             MimeMessage mimeMessage = new MimeMessage(session, inputStream);
             ParseMail pmm = new ParseMail((MimeMessage) mimeMessage);
-            pmm.setDateFormat("yy年MM月dd日 HH:mm");
 
             // 将标题，发送人，接收人，抄送人，时间写入json文件
             ObjectMapper mapper = new ObjectMapper();
             ObjectNode node = mapper.createObjectNode();
             node.put("subject", pmm.getSubject());
             //TODO 待处理
-//            node.put("sentdate", pmm.getSentDate());
-//            node.put("form", pmm.getFrom());
+            node.put("sentdate", pmm.getSentDate());
+            node.put("form", pmm.getFrom());
             node.put("to", pmm.getMailAddress("to"));
             node.put("cc", pmm.getMailAddress("cc"));
             node.put("bcc", pmm.getMailAddress("bcc"));
