@@ -33,8 +33,12 @@ public class ParseMail {
      */
     public String getSentDate() throws Exception {
         Date sentdate = mimeMessage.getSentDate();
-        SimpleDateFormat format = new SimpleDateFormat(dateformat);
-        return format.format(sentdate);
+        if(null == sentdate){
+            return "";
+        }else{
+            SimpleDateFormat format = new SimpleDateFormat(dateformat);
+            return format.format(sentdate);
+        }
     }
 
     /**
